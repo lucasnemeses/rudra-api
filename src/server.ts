@@ -4,8 +4,8 @@ import { db } from './database'
 const app = fastify()
 
 app.get('/hello', async () => {
-  const tables = await db('sqlite_schema').select('*')
-  return tables
+  const transaction = await db('transactions').select('*')
+  return transaction
 })
 
 app
