@@ -3,6 +3,28 @@ import { z } from 'zod'
 import { db } from '../database'
 
 export async function transactionsRoutes(app: FastifyInstance) {
+  app.get('/', async () => {
+    const transactions = await db('transactions').select()
+
+    return {
+      transactions,
+    }
+  })
+
+  app.get('/:id', async (request) => {
+    const getTransactionParamsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = getTransactionParamsSchema.parse(request.params)
+
+    const transaction = await db('transactions').where('id', id).first()
+
+    return {
+      transaction,
+    }
+  })
+
   app.post('/', async (request, reply) => {
     const createTransactionBodySchema = z.object({
       title: z.string(),
@@ -18,7 +40,6 @@ export async function transactionsRoutes(app: FastifyInstance) {
       id: crypto.randomUUID(),
       title,
       amount: type === 'credit' ? amount : amount * -1,
-      created_at: new Date().toISOString(),
     })
 
     return reply.status(201).send()
