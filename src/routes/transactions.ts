@@ -20,9 +20,15 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
     const transaction = await db('transactions').where('id', id).first()
 
-    return {
-      transaction,
-    }
+    return { transaction }
+  })
+
+  app.get('/summary', async () => {
+    const summary = await db('transactions')
+      .sum('amount', { as: 'amount' })
+      .first()
+
+    return { summary }
   })
 
   app.post('/', async (request, reply) => {
